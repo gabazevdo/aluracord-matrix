@@ -1,3 +1,6 @@
+import appConfig from "../config.json";
+
+
 function GlobalStyle() {
   return (
     <style global jsx>{`
@@ -7,9 +10,23 @@ function GlobalStyle() {
         box-sizing: border-box;
         list-style: none;
       }
+
       body {
         font-family: "Open Sans", sans-serif;
+        
       }
+
+      ::-webkit-scrollbar {
+        width: 5px;               
+      }
+      
+      
+      ::-webkit-scrollbar-thumb {
+        background-color: #181F25;  
+        border-radius: 20px;   
+        border: 3px solid #181F25; 
+      }
+
 
       /* App fit Height */
       html,
