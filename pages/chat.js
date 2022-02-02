@@ -1,19 +1,45 @@
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React from "react";
 import appConfig from "../config.json";
+import { useRouter } from "next/router";
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0Mzc1NjczOCwiZXhwIjoxOTU5MzMyNzM4fQ.3e0_ujE8GP0dDFNWi195-pvxPZEd0whJB1Xr4wpgUzc";
+const SUPABASE_URL = "https://dvkzpxfegymfqcnbctyt.supabase.co";
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function ChatPage() {
   const [mensagem, setMensagem] = React.useState("");
   const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
+  const root = useRouter();
+  const userLogado = root.query.username;
+
+
+  console.log('teste' + userLogado)
+
+  React.useEffect(() => {
+    const dadosSupabase = supabaseClient
+      .from("mensagens")
+      .select("*")
+      .order("id", { ascending: false })
+      .then(({ data }) => {
+        setListaDeMensagens(data);
+      });
+  }, [listaDeMensagens]);
 
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
-      id: listaDeMensagens.length + 1,
-      de: "vanessametonini",
+      de: userLogado,
       texto: novaMensagem,
     };
 
-    setListaDeMensagens([mensagem, ...listaDeMensagens]);
+    supabaseClient
+      .from("mensagens")
+      .insert([mensagem])
+      .then(({ data }) => {
+        setListaDeMensagens([data[0], ...listaDeMensagens]);
+      });
     setMensagem("");
   }
 
@@ -68,6 +94,7 @@ export default function ChatPage() {
             }}
           >
             <TextField
+              key={mensagem.id}
               value={mensagem}
               onChange={(event) => {
                 const valor = event.target.value;
@@ -124,11 +151,11 @@ function Header() {
 }
 
 function MessageList(props) {
-  
-    // Para deletar a mensagem
-    const delMensagem = (i) => {
-        const deleteItem = mensagem.filter()
-      }
+  // Para deletar a mensagem
+  const delMensagem = (delMensagem) => {
+    console.log("Id da mensagem no click " + delMensagem);
+    
+  };
 
   return (
     <Box
@@ -181,7 +208,7 @@ function MessageList(props) {
                     display: "inline-block",
                     marginRight: "8px",
                   }}
-                  src={`https://github.com/gabazevdo.png`}
+                  src={`https://github.com/${mensagem.de}.png`}
                 />
                 <Text tag="strong">{mensagem.de}</Text>
 
@@ -205,7 +232,8 @@ function MessageList(props) {
               }}
             >
               <Button
-                onClick={() => delMensagem()}
+                key={mensagem.id}
+                onClick={() => delMensagem(mensagem.id)}
                 styleSheet={{
                   borderRadius: "0 5px 5px 0",
                   backgroundColor: "#9E2A2B",
