@@ -3,20 +3,27 @@ import React from "react";
 import appConfig from "../config.json";
 import { useRouter } from "next/router";
 import { createClient } from "@supabase/supabase-js";
+import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
 
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0Mzc1NjczOCwiZXhwIjoxOTU5MzMyNzM4fQ.3e0_ujE8GP0dDFNWi195-pvxPZEd0whJB1Xr4wpgUzc";
 const SUPABASE_URL = "https://dvkzpxfegymfqcnbctyt.supabase.co";
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function mensagemEmTempoReal(adicionaMensagem) {
+  return supabaseClient
+    .from("mensagens")
+    .on("INSERT", (reponse) => {
+      adicionaMensagem(reponse.new);
+    })
+    .subscribe();
+}
+
 export default function ChatPage() {
   const [mensagem, setMensagem] = React.useState("");
   const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
   const root = useRouter();
   const userLogado = root.query.username;
-
-
-  console.log('teste' + userLogado)
 
   React.useEffect(() => {
     const dadosSupabase = supabaseClient
@@ -26,7 +33,14 @@ export default function ChatPage() {
       .then(({ data }) => {
         setListaDeMensagens(data);
       });
-  }, [listaDeMensagens]);
+
+    mensagemEmTempoReal((novaMensagem) => {
+      setListaDeMensagens((valorAtualDaLista)=> {
+        return[novaMensagem, ...valorAtualDaLista]
+      });
+    });
+
+  }, []);
 
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
@@ -37,9 +51,7 @@ export default function ChatPage() {
     supabaseClient
       .from("mensagens")
       .insert([mensagem])
-      .then(({ data }) => {
-        setListaDeMensagens([data[0], ...listaDeMensagens]);
-      });
+      .then(({ data }) => {});
     setMensagem("");
   }
 
@@ -119,6 +131,11 @@ export default function ChatPage() {
                 color: appConfig.theme.colors.neutrals[200],
               }}
             />
+            <ButtonSendSticker
+              onStickerClick={(sticker) => {
+                handleNovaMensagem(":sticker: " + sticker);
+              }}
+            />
           </Box>
         </Box>
       </Box>
@@ -154,7 +171,6 @@ function MessageList(props) {
   // Para deletar a mensagem
   const delMensagem = (delMensagem) => {
     console.log("Id da mensagem no click " + delMensagem);
-    
   };
 
   return (
@@ -223,7 +239,17 @@ function MessageList(props) {
                   {new Date().toLocaleDateString()}
                 </Text>
               </Box>
-              {mensagem.texto}
+              {mensagem.texto.startsWith(":sticker:") ? (
+                <Image
+                  styleSheet={{
+                    maxWidth: "200px",
+                    minHeight: "200px",
+                  }}
+                  src={mensagem.texto.replace(":sticker:", "")}
+                />
+              ) : (
+                mensagem.texto
+              )}
             </Text>
             {/*Botao para deletar*/}
             <Box
