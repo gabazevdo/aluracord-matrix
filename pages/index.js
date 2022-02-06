@@ -1,6 +1,6 @@
 import appConfig from "../config.json";
 import { Box, Button, Text, TextField, Image } from "@skynexui/components";
-import bgHome from "../images/bgHome.jpg";
+import bg from "../images/a.png";
 import React from "react";
 import { useRouter } from "next/router";
 
@@ -32,7 +32,7 @@ export default function PaginaInicial() {
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: appConfig.theme.colors.primary[500],
-          backgroundImage: `url(${bgHome})`,
+          backgroundImage: `url(https://cdn.pixabay.com/photo/2016/07/11/17/43/abstract-1510187_960_720.png)`,
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundBlendMode: "multiply",
@@ -89,8 +89,9 @@ export default function PaginaInicial() {
               onChange={function (event) {
                 const valor = event.target.value;
                 setUsername(valor);
-                console.log(valor);
-              }}
+                }}
+              placeholder="Seu usuário GitHub aqui..."
+                
               fullWidth
               textFieldColors={{
                 neutral: {
@@ -136,7 +137,7 @@ export default function PaginaInicial() {
                 borderRadius: "50%",
                 marginBottom: "16px",
               }}
-              src={`https://github.com/${username}.png`}
+              src={username ? `https://github.com/${username}.png` : 'https://cdn-icons-png.flaticon.com/512/25/25231.png'}
             />
             <Text
               variant="body4"
@@ -147,7 +148,8 @@ export default function PaginaInicial() {
                 borderRadius: "1000px",
               }}
             >
-              {username}
+              {username ? username : 'user'}
+              
             </Text>
           </Box>
           {/* Photo Area */}

@@ -5,6 +5,12 @@ import { useRouter } from "next/router";
 import { createClient } from "@supabase/supabase-js";
 import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
 
+/* Icones - React-icons */
+import { FaRegTrashAlt, FaTelegramPlane } from "react-icons/fa";
+
+const trash = <FaRegTrashAlt />;
+const send = <FaTelegramPlane />;
+
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0Mzc1NjczOCwiZXhwIjoxOTU5MzMyNzM4fQ.3e0_ujE8GP0dDFNWi195-pvxPZEd0whJB1Xr4wpgUzc";
 const SUPABASE_URL = "https://dvkzpxfegymfqcnbctyt.supabase.co";
@@ -35,11 +41,10 @@ export default function ChatPage() {
       });
 
     mensagemEmTempoReal((novaMensagem) => {
-      setListaDeMensagens((valorAtualDaLista)=> {
-        return[novaMensagem, ...valorAtualDaLista]
+      setListaDeMensagens((valorAtualDaLista) => {
+        return [novaMensagem, ...valorAtualDaLista];
       });
     });
-
   }, []);
 
   function handleNovaMensagem(novaMensagem) {
@@ -131,11 +136,33 @@ export default function ChatPage() {
                 color: appConfig.theme.colors.neutrals[200],
               }}
             />
+            {/* Botão stickes */}
             <ButtonSendSticker
               onStickerClick={(sticker) => {
                 handleNovaMensagem(":sticker: " + sticker);
               }}
             />
+            {/* Botão enviar */}
+            <Button
+              styleSheet={{
+                backgroundColor: "transparent",
+                margin: "10 10px",
+                marginBottom:'8px',
+                filter: "grayscale(1)",
+                
+                hover: {
+                  filter: "grayscale(0)",
+                  backgroundColor: "transparent",
+                  color: appConfig.theme.colors.neutrals[800],
+                },
+              }}
+              onClick={() => {
+                handleNovaMensagem(mensagem);
+              }}
+              label="📨"
+            >
+              Olá
+            </Button>
           </Box>
         </Box>
       </Box>
@@ -170,7 +197,7 @@ function Header() {
 function MessageList(props) {
   // Para deletar a mensagem
   const delMensagem = (delMensagem) => {
-    console.log("Id da mensagem no click " + delMensagem);
+    alert("Falta implementar - id: " + delMensagem);
   };
 
   return (
@@ -260,9 +287,13 @@ function MessageList(props) {
               <Button
                 key={mensagem.id}
                 onClick={() => delMensagem(mensagem.id)}
+                label={trash}
                 styleSheet={{
                   borderRadius: "0 5px 5px 0",
                   backgroundColor: "#9E2A2B",
+                  select: {
+                    backgroundColor: "#FFF",
+                  },
 
                   hover: {
                     backgroundColor: "#B12F31",
